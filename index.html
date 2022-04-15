@@ -71,78 +71,6 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-SDN1" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2022/04/16/SDN1/" class="article-date">
-  <time class="dt-published" datetime="2022-04-15T16:03:34.461Z" itemprop="datePublished">2022-04-16</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="作业1"><a href="#作业1" class="headerlink" title="作业1"></a>作业1</h1><h3 id="作业要求："><a href="#作业要求：" class="headerlink" title="作业要求："></a>作业要求：</h3><p>A和B采用TCP通信，连接成功以后，A的起始序列号是500，B的起始序列号是800，A首先发起通信，发出消息：Hello！（6个字节）；此消息B正确收到，B回复ACK，请问此时的ACK Num是多少？  A收到ACK回复后，再次发送消息：Are you OK? (11个字节)，此消息丢失，此时，B发出消息给A：Hello!(6个字节)，请问此时B发出的消息中的ACK Num是多少？ 此消息A正确收到，A将如何做？如果A发消息，消息中的sequence<br>Number和Ack Number分别是多少？</p>
-<p>设计一个实验来进行实地测试，给出测试结果截图。</p>
-<h3 id="实验设计思路："><a href="#实验设计思路：" class="headerlink" title="实验设计思路："></a>实验设计思路：</h3><p>考虑到本实验采用TCP协议通信，而Java中的Socket类也是采用建立TCP连接进行通讯的，因此此次实验的通信程序采用Java Socket进行编写。因为本次实验中要实现丢包，而人为实现定向的丢包我无法实现，在与同学讨论后，决定使用Clumsy软件，将网络丢包率设置为50%以实现丢包操作。同时利用wireshark进行抓包。具体实验过程如下：</p>
-<h3 id="实验过程："><a href="#实验过程：" class="headerlink" title="实验过程："></a>实验过程：</h3><p>本次实验所用的通信程序代码如下：</p>
-<p>A：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.io.InputStream;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line">import java.io.OutputStream;</span><br><span class="line">import java.io.PrintWriter;</span><br><span class="line">import java.net.ServerSocket;</span><br><span class="line">import java.net.Socket;</span><br><span class="line">import java.util.Scanner;</span><br><span class="line"></span><br><span class="line">public class Receiver &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            ServerSocket server = new ServerSocket(8888);</span><br><span class="line">            System.out.println(&quot;连接创建中&quot;);</span><br><span class="line">            Socket socket = server.accept();</span><br><span class="line">            System.out.println(&quot;----程序已经连接----&quot;);</span><br><span class="line">            InputStream is = socket.getInputStream();</span><br><span class="line">            OutputStream os = socket.getOutputStream();</span><br><span class="line">            InputStreamReader isr = new InputStreamReader(is);</span><br><span class="line">            BufferedReader br = new BufferedReader(isr);</span><br><span class="line">            PrintWriter pw = new PrintWriter(os);</span><br><span class="line">            Runnable r1 = new Runnable() &#123;</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    while (true) &#123;</span><br><span class="line">                        String str;</span><br><span class="line">                        try &#123;</span><br><span class="line">                            str = br.readLine();</span><br><span class="line">                            System.out.println(&quot;B：&quot; + str);</span><br><span class="line">                        &#125; catch (IOException e) &#123;</span><br><span class="line">                            e.printStackTrace();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">            Runnable r2 = new Runnable() &#123;</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    while (true) &#123;</span><br><span class="line">                        Scanner scan = new Scanner(System.in);</span><br><span class="line">                        String msg = scan.nextLine();</span><br><span class="line">                        pw.print(msg);</span><br><span class="line">                        pw.flush();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">  </span><br><span class="line">            Thread t1 = new Thread(r1);</span><br><span class="line">            Thread t2 = new Thread(r2);</span><br><span class="line">            t1.start();</span><br><span class="line">            t2.start();</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>B:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.io.InputStream;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line">import java.io.OutputStream;</span><br><span class="line">import java.io.PrintWriter;</span><br><span class="line">import java.net.Socket;</span><br><span class="line">import java.net.UnknownHostException;</span><br><span class="line">import java.util.Scanner;</span><br><span class="line"></span><br><span class="line">public class Sender &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Socket socket = new Socket(&quot;127.0.0.1&quot;,8888);</span><br><span class="line">            System.out.println(&quot;客户端连接成功&quot;);</span><br><span class="line">            InputStream is = socket.getInputStream();</span><br><span class="line">            OutputStream os = socket.getOutputStream();</span><br><span class="line">            InputStreamReader isr = new InputStreamReader(is);</span><br><span class="line">            BufferedReader br = new BufferedReader(isr);</span><br><span class="line">            PrintWriter pw = new PrintWriter(os);</span><br><span class="line">            Runnable r = new Runnable() &#123;</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    while (true) &#123;</span><br><span class="line">                        try &#123;</span><br><span class="line">                            Scanner scan = new Scanner(System.in);</span><br><span class="line">                            String msg = scan.nextLine();</span><br><span class="line">                            pw.print(msg);</span><br><span class="line">                            pw.flush();</span><br><span class="line">                        &#125; catch (Exception e) &#123;</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line"></span><br><span class="line">            Runnable r2 = new Runnable() &#123;</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    while (true) &#123;</span><br><span class="line">                        String str;</span><br><span class="line">                        try &#123;</span><br><span class="line">                            str = br.readLine();</span><br><span class="line">                            System.out.println(&quot;A：&quot; + str);</span><br><span class="line">                        &#125; catch (IOException e) &#123;</span><br><span class="line">                            e.printStackTrace();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">            Thread t1 = new Thread(r);</span><br><span class="line">            Thread t2 = new Thread(r2);</span><br><span class="line">            t1.start();</span><br><span class="line">            t2.start();</span><br><span class="line"></span><br><span class="line">        &#125; catch (UnknownHostException e) &#123;</span><br><span class="line"></span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line"></span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>端口为8888，发送的IP地址为127.0.0.1，即本机回送地址。</p>
-<h4 id="A与B的通信过程："><a href="#A与B的通信过程：" class="headerlink" title="A与B的通信过程："></a>A与B的通信过程：</h4><p>运行程序并启用wireshark抓包，立刻停止运行，抓到的包如下：</p>
-<p><img src="/image/SDN1/1648572179972.png" alt="1648572179972.png"></p>
-<p>最开始的三个包，对应TCP建立连接时的三次握手过程，即：</p>
-<p><img src="/image/SDN1/1648649181104.png"></p>
-<p>最后的四个包，对应TCP断开连接时的四次挥手过程，即：</p>
-<p><img src="/image/SDN1/1648649246382.png"></p>
-<h4 id="通信实验测试："><a href="#通信实验测试：" class="headerlink" title="通信实验测试："></a>通信实验测试：</h4><p>启动程序并开始抓包。由A发送Hello!给B，抓到的包如下：</p>
-<p><img src="/image/SDN1/1648568015390.png" alt="1648568015390.png"></p>
-<p>可以看到，A发送的SEQ Num为1、ACK Num为1；B回复的ACK Num为7.</p>
-<p>接着打开clumsy软件，将丢包率设置为50%</p>
-<p><img src="/image/SDN1/1648569200282.png" alt="1648569200282.png"></p>
-<p>由A发送Are you OK?给B，捕获的包如下：</p>
-<p><img src="/image/SDN1/1648569269809.png" alt="1648569269809.png"></p>
-<p>可以看到，在发送方A，经由8888端口发送第6号包后，由于包在发送过程中丢失，接收方B并未收到A发送的TCP包，因此便没有应答报文返回给A。而发送方A由于长时间没有接收到来自B的应答报文，因此便触发了超时重传机制，向接收方B发送重传包，即两个TCP Retransmission包。当接收方B接收到该重传包后，回复了一个ACK确认报文，发送方A在收到该确认报文后，认为B已经接收到自己发送的信息，因此便停止超时重传。</p>
-<p>此时发送方A发送的TCP报文的SEQ Num为7，ACK Num为1；接收方B发送的ACK确认报文的ACK Num为18。</p>
-<p>由B发送Hello!给A，捕获的包如下：</p>
-<p><img src="/image/SDN1/1648570039427.png" alt="1648570039427.png"></p>
-<p>此时，B发出消息的ACK Num为18；A正确收到后，会向发送方B回复一个ACK确认包，其SEQ Num为18，ACK Num为7。</p>
-<p>再用A向B发送Hello!后，捕获的包如下：</p>
-<p><img src="/image/SDN1/1648571174473.png" alt="1648571174473.png"></p>
-<p>可以看到，A发消息，其SEQ Num为18，ACK Num为7。</p>
-<h4 id="实验结果："><a href="#实验结果：" class="headerlink" title="实验结果："></a>实验结果：</h4><p>根据上述实验情况，由于发送时的包起始ACK Num为1，题目要求的A的起始ACK Num是500，B为800。因此根据上述实验结果加上系数可以推得：</p>
-<p>1、A首先发起通信，发出消息：Hello！（6个字节）；此消息B正确收到，B回复ACK，请问此时的ACK Num是多少？</p>
-<p>答：B回复得ACK Num为506。</p>
-<p>2、A收到ACK回复后，再次发送消息：Are you OK? (11个字节)，此消息丢失，此时，B发出消息给A：Hello!(6个字节)，请问此时B发出的消息中的ACK Num是多少？</p>
-<p>答：B发出消息的ACK Num为517。</p>
-<p>3、此消息A正确收到，A将如何做？</p>
-<p>答：A回复给B一个ACK确认包，其SEQ Num为517，ACK Num为806。</p>
-<p>4、如果A发消息，消息中的sequence Number和Ack Number分别是多少？</p>
-<p>答：A发信息的SEQ Num为517，ACK Num为806。</p>
-<h3 id="实验总结："><a href="#实验总结：" class="headerlink" title="实验总结："></a>实验总结：</h3><pre><code>本次实验的结果建立在B发送第一个&quot;Hello!&quot;时，A已经完成了超时重传。若当B发送第一个&quot;Hello&quot;时，A并未触发超时重传机制，此时的B发出的消息的ACK Num应为506。A正确收到消息后，会回复B一个ACK确认包，其SEQ Num为506，ACK Num为806。之后A会触发超时重传机制，重新发送丢失的&quot;Are you OK?&quot;包。具体流程如下：
-</code></pre>
-<p><img src="/image/SDN1/1648652236945.png"></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2022/04/16/SDN1/" data-id="cl20me7bz000030vjak0je3cn" data-title="" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
     <article id="post-first" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2022/04/16/first/" class="article-date">
@@ -169,7 +97,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2022/04/16/first/" data-id="cl20me7c9000130vj88h5h8vp" data-title="first" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2022/04/16/first/" data-id="cl20n08ev00009wvj0f9q2nmy" data-title="first" class="article-share-link">Share</a>
       
       
       
@@ -220,7 +148,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2022/04/15/hello-world/" data-id="cl20lz6110000wsvj4raxebq9" data-title="Hello World" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2022/04/15/hello-world/" data-id="cl20n08fj00019wvj0cid5yq4" data-title="Hello World" class="article-share-link">Share</a>
       
       
       
@@ -261,10 +189,6 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
-        
-          <li>
-            <a href="/2022/04/16/SDN1/">(no title)</a>
-          </li>
         
           <li>
             <a href="/2022/04/16/first/">first</a>
